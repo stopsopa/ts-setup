@@ -1,0 +1,10 @@
+{
+  "include": ["src/**/*.ts"],
+  "exclude": [
+    "src/**/*.test.ts",
+    "ts-resolver.js",
+    "node-suppress-warning.js",
+    "node_modules/**"
+  ],
+  "all": true
+}
