@@ -3,8 +3,8 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 export NODE_OPTIONS=""
 
-if [ "${CHECK}" = "true" ] || [ "${1}" = "--force" ]; then
-  if [ -z "${SILENT}" ]; then
+if [[ "${CHECK}" != "false" ]]; then
+  if [[ -z "${SILENT}" ]]; then
     cat <<EEE
 
   Type-checking ...
