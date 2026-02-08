@@ -13,7 +13,7 @@ export NODE_NO_WARNINGS=1
 # require node-suppress-warning.js
 # require node.config.json
 
-if [[ "${@}" != *"--no-check"* ]] && [[ "${CHECK}" != "false" ]]; then
+if [[ "${CHECK}" != "false" ]]; then
   if [ -z "${SILENT}" ]; then
     cat <<EEE
 
@@ -49,7 +49,7 @@ if [[ "${@}" == *"--test"* ]]; then
   # https://github.com/bcoe/c8/issues/136#issuecomment-680456108
   # also reseting NODE_OPTIONS to empty string for wrapper c8 process but forwarding it as is to the main testing process
   NODE_OPTIONS="" npx c8 "${REPORTERS[@]}" \
-    env NODE_OPTIONS="$NODE_OPTIONS" "${NODE_CMD[@]}" "${@}"
+    env NODE_OPTIONS="${NODE_OPTIONS}" "${NODE_CMD[@]}" "${@}"
 else
   "${NODE_CMD[@]}" "${@}"
 fi
