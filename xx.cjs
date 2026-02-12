@@ -21,7 +21,7 @@ set -e
 # git config core.excludesFile .git/.gitignore_local
 
 source .env
-// source .env.sh
+# source .env.sh
         
 cat <<EEE
 

@@ -49,7 +49,8 @@ if [[ "${@}" == *"--test"* ]]; then
   # https://github.com/bcoe/c8/issues/136#issuecomment-680456108
   # also reseting NODE_OPTIONS to empty string for wrapper c8 process but forwarding it as is to the main testing process
   NODE_OPTIONS="" npx c8 "${REPORTERS[@]}" \
-    env NODE_OPTIONS="${NODE_OPTIONS}" "${NODE_CMD[@]}" "${@}"
+    env NODE_OPTIONS="${NODE_OPTIONS}" \
+    "${NODE_CMD[@]}" "${@}"
 else
   "${NODE_CMD[@]}" "${@}"
 fi
