@@ -1,29 +1,24 @@
-import { describe, it, before, after } from "node:test";
-import assert from "node:assert/strict";
-import path from "path";
-import { promises as fs } from "fs";
-import { getPathStatus, writeFile, readFile, removePath } from "./fs-async.ts";
+import { describe, it, beforeAll, afterAll, expect } from "vitest";
+import path from "node:path";
+import fs from "node:fs/promises";
+import { getPathStatus, writeFile, readFile, removePath } from "./fs-async.js";
 
 /**
- * /bin/bash ts.sh --test src/test-examples/fs-async.test.ts
+ * /bin/bash test.sh src/test-examples/fs-async.test.ts
  */
 describe("fs-async example tests", () => {
   const testDir = path.resolve("temp-test-dir");
   const testFile = path.resolve(testDir, "example.txt");
   const testSubDir = path.resolve(testDir, "subdir");
 
-  before(async () => {
+  beforeAll(async () => {
     // Cleanup any leftovers
-    try {
-      await fs.rm(testDir, { recursive: true, force: true });
-    } catch {}
+    await fs.rm(testDir, { recursive: true, force: true });
   });
 
-  after(async () => {
+  afterAll(async () => {
     // Cleanup
-    try {
-      await fs.rm(testDir, { recursive: true, force: true });
-    } catch {}
+    await fs.rm(testDir, { recursive: true, force: true });
   });
 
   it("should write and read a file successfully", async () => {
@@ -31,7 +26,7 @@ describe("fs-async example tests", () => {
     await writeFile(testFile, content);
 
     const readContent = await readFile(testFile);
-    assert.strictEqual(readContent, content);
+    expect(readContent).toBe(content);
   });
 
   it("should check path status correctly (file, dir, exists)", async () => {
@@ -39,34 +34,29 @@ describe("fs-async example tests", () => {
 
     // Check file status
     const fileStatus = await getPathStatus(testFile);
-    assert.strictEqual(fileStatus.exists, true);
-    assert.strictEqual(fileStatus.isFile, true);
-    assert.strictEqual(fileStatus.isDirectory, false);
-    assert.strictEqual(fileStatus.isReadable, true);
-    assert.strictEqual(fileStatus.isWritable, true);
+    expect(fileStatus.exists).toBe(true);
+    expect(fileStatus.isFile).toBe(true);
+    expect(fileStatus.isDirectory).toBe(false);
+    expect(fileStatus.isReadable).toBe(true);
+    expect(fileStatus.isWritable).toBe(true);
 
     // Check directory status
     const dirStatus = await getPathStatus(testSubDir);
-    assert.strictEqual(dirStatus.exists, true);
-    assert.strictEqual(dirStatus.isFile, false);
-    assert.strictEqual(dirStatus.isDirectory, true);
+    expect(dirStatus.exists).toBe(true);
+    expect(dirStatus.isFile).toBe(false);
+    expect(dirStatus.isDirectory).toBe(true);
 
     // Check non-existent path
     const nonExistentStatus = await getPathStatus(
       path.resolve(testDir, "ghost.txt"),
     );
-    assert.strictEqual(nonExistentStatus.exists, false);
+    expect(nonExistentStatus.exists).toBe(false);
   });
 
   it("should handle reading non-existent file with custom error message", async () => {
     const ghostPath = path.resolve(testDir, "ghost.txt");
-    await assert.rejects(
-      () => readFile(ghostPath),
-      (err: any) => {
-        return err.message.includes(
-          `fs-async.ts error: Failed to read ${ghostPath}`,
-        );
-      },
+    await expect(readFile(ghostPath)).rejects.toThrow(
+      `fs-async.ts error: Failed to read ${ghostPath}`,
     );
   });
 
@@ -74,12 +64,12 @@ describe("fs-async example tests", () => {
     // Test file removal
     await removePath(testFile);
     const fileStatus = await getPathStatus(testFile);
-    assert.strictEqual(fileStatus.exists, false);
+    expect(fileStatus.exists).toBe(false);
 
     // Test directory removal
     await removePath(testSubDir);
     const dirStatus = await getPathStatus(testSubDir);
-    assert.strictEqual(dirStatus.exists, false);
+    expect(dirStatus.exists).toBe(false);
   });
 
   it("should check symlink status (if supported by OS/permissions)", async () => {
@@ -91,8 +81,8 @@ describe("fs-async example tests", () => {
       await fs.symlink(targetPath, symlinkPath);
 
       const status = await getPathStatus(symlinkPath);
-      assert.strictEqual(status.exists, true);
-      assert.strictEqual(status.isSymbolicLink, true);
+      expect(status.exists).toBe(true);
+      expect(status.isSymbolicLink).toBe(true);
 
       // Cleanup symlink
       await fs.unlink(symlinkPath);

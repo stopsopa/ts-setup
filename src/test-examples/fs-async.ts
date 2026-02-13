@@ -1,5 +1,6 @@
-import { promises as fsPromises, constants } from "fs";
-import path from "path";
+import fs from "node:fs/promises";
+import { constants } from "node:fs";
+import path from "node:path";
 
 /**
  * Modern async file system operations example
@@ -32,7 +33,7 @@ export async function getPathStatus(targetPath: string): Promise<PathStatus> {
   try {
     // Check if path exists and get stats
     // Use lstat to not follow symlinks for the initial check
-    const stats = await fsPromises.lstat(targetPath);
+    const stats = await fs.lstat(targetPath);
     status.exists = true;
     status.isFile = stats.isFile();
     status.isDirectory = stats.isDirectory();
@@ -41,7 +42,7 @@ export async function getPathStatus(targetPath: string): Promise<PathStatus> {
 
     // Check readability
     try {
-      await fsPromises.access(targetPath, constants.R_OK);
+      await fs.access(targetPath, constants.R_OK);
       status.isReadable = true;
     } catch {
       status.isReadable = false;
@@ -49,7 +50,7 @@ export async function getPathStatus(targetPath: string): Promise<PathStatus> {
 
     // Check writability
     try {
-      await fsPromises.access(targetPath, constants.W_OK);
+      await fs.access(targetPath, constants.W_OK);
       status.isWritable = true;
     } catch {
       status.isWritable = false;
@@ -73,10 +74,10 @@ export async function writeFile(
     const dir = path.dirname(filePath);
 
     // Ensure parent directory exists
-    await fsPromises.mkdir(dir, { recursive: true });
+    await fs.mkdir(dir, { recursive: true });
 
     // Write file
-    await fsPromises.writeFile(filePath, content, "utf8");
+    await fs.writeFile(filePath, content, "utf8");
   } catch (error: any) {
     throw new Error(
       `fs-async.ts error: Failed to write to ${filePath}. ${error.message}`,
@@ -89,7 +90,7 @@ export async function writeFile(
  */
 export async function readFile(filePath: string): Promise<string> {
   try {
-    return await fsPromises.readFile(filePath, "utf8");
+    return await fs.readFile(filePath, "utf8");
   } catch (error: any) {
     throw new Error(
       `fs-async.ts error: Failed to read ${filePath}. ${error.message}`,
@@ -105,7 +106,7 @@ export async function removePath(targetPath: string): Promise<void> {
     // fs.rm works for both files and directories.
     // recursive: true - allows deleting directories with content.
     // force: true - ignores ENOENT (file not found) errors, making it idempotent.
-    await fsPromises.rm(targetPath, { recursive: true, force: true });
+    await fs.rm(targetPath, { recursive: true, force: true });
   } catch (error: any) {
     throw new Error(
       `fs-async.ts error: Failed to remove ${targetPath}. ${error.message}`,

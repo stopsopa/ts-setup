@@ -5,6 +5,10 @@ import { config } from "./config.ts";
 import apiRouter from "./routes/api.ts";
 import formRouter from "./routes/form.ts";
 
+/**
+ * /bin/bash ts.sh --watch src/server.ts
+ */
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "../");
 const web = join(root, "public");
