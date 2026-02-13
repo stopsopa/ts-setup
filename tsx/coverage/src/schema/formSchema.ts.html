@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for src/routes/api.ts</title>
+    <title>Code coverage report for src/schema/formSchema.ts</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../../prettify.css" />
     <link rel="stylesheet" href="../../base.css" />
@@ -19,13 +19,13 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../index.html">All files</a> / <a href="index.html">src/routes</a> api.ts</h1>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">src/schema</a> formSchema.ts</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/14</span>
+                <span class='fraction'>0/23</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/14</span>
+                <span class='fraction'>0/23</span>
             </div>
         
             
@@ -82,44 +82,68 @@
 <a name='L17'></a><a href='#L17'>17</a>
 <a name='L18'></a><a href='#L18'>18</a>
 <a name='L19'></a><a href='#L19'>19</a>
-<a name='L20'></a><a href='#L20'>20</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >import { Router } from "express";<span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" ></span></span></span>
-<span class="cstat-no" title="statement not covered" >import { sum } from "../test-examples/add.js";</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >import { z } from "zod";<span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" ></span></span></span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >const router = Router();</span>
-&nbsp;
-<span class="cstat-no" title="statement not covered" >router.get("/sum", (req, res) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >  const a = parseInt(req.query.a as string);</span>
-<span class="cstat-no" title="statement not covered" >  const b = parseInt(req.query.b as string);</span>
-&nbsp;
-<span class="cstat-no" title="statement not covered" >  if (isNaN(a) || isNaN(b)) {</span>
-<span class="cstat-no" title="statement not covered" >    return res</span>
-<span class="cstat-no" title="statement not covered" >      .status(400)</span>
-<span class="cstat-no" title="statement not covered" >      .json({ error: "Parameters a and b must be numbers" });</span>
-<span class="cstat-no" title="statement not covered" >  }</span>
-&nbsp;
-<span class="cstat-no" title="statement not covered" >  res.json({ result: sum(a, b) });</span>
+<span class="cstat-no" title="statement not covered" >export const formSchema = z.object({</span>
+<span class="cstat-no" title="statement not covered" >  id: z.string().optional(),</span>
+<span class="cstat-no" title="statement not covered" >  name: z.string().min(3, "Name must be at least 3 characters"),</span>
+<span class="cstat-no" title="statement not covered" >  email: z.email("Invalid email address"),</span>
+<span class="cstat-no" title="statement not covered" >  age: z.coerce</span>
+<span class="cstat-no" title="statement not covered" >    .number()</span>
+<span class="cstat-no" title="statement not covered" >    .min(18, "Must be at least 18 years old")</span>
+<span class="cstat-no" title="statement not covered" >    .max(100, "Must be less than 100"),</span>
+<span class="cstat-no" title="statement not covered" >  role: z.enum(["admin", "user", "guest"]),</span>
+<span class="cstat-no" title="statement not covered" >  bio: z.string().min(10, "Bio must be at least 10 characters"),</span>
+<span class="cstat-no" title="statement not covered" >  notifications: z.boolean().default(false),</span>
+<span class="cstat-no" title="statement not covered" >  tags: z.array(z.string()).min(1, "Select at least one tag"),</span>
 <span class="cstat-no" title="statement not covered" >});</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >export default router;</span>
+export type FormType = z.infer&lt;typeof formSchema&gt;;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const defaultFormValues: FormType = {</span>
+<span class="cstat-no" title="statement not covered" >  name: "",</span>
+<span class="cstat-no" title="statement not covered" >  email: "",</span>
+<span class="cstat-no" title="statement not covered" >  age: 18,</span>
+<span class="cstat-no" title="statement not covered" >  role: "user",</span>
+<span class="cstat-no" title="statement not covered" >  bio: "",</span>
+<span class="cstat-no" title="statement not covered" >  notifications: true,</span>
+<span class="cstat-no" title="statement not covered" >  tags: ["general"],</span>
+<span class="cstat-no" title="statement not covered" >};</span>
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -127,7 +151,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-02-13T02:47:16.667Z
+                at 2026-02-13T02:47:16.681Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
