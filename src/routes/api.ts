@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { sum } from "../add.ts";
+import { sum } from "../test-examples/add.js";
 
 const router = Router();
 
