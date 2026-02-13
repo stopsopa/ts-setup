@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Simple Zod Form</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        line-height: 1.5;
+        max-width: 600px;
+        margin: 40px auto;
+        padding: 0 20px;
+        color: #333;
+      }
+      .form-group {
+        margin-bottom: 20px;
+      }
+      label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+      input[type="text"],
+      input[type="email"],
+      input[type="number"],
+      select,
+      textarea {
+        display: block;
+        width: 100%;
+        padding: 12px; /* Higher inputs */
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+        font-size: 16px;
+      }
+      .error-message {
+        color: red;
+        font-size: 14px;
+        margin-top: 5px;
+        min-height: 18px;
+      }
+      button {
+        padding: 12px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+      .status {
+        margin-top: 20px;
+        padding: 10px;
+        border-radius: 4px;
+        display: none;
+      }
+      .status.success {
+        display: block;
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      .status.error {
+        display: block;
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+      nav {
+        margin-bottom: 30px;
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <a href="/form/list">← Back to List</a>
+    </nav>
+
+    <h1 id="title">Create Entity</h1>
+
+    <form id="entityForm">
+      <input type="hidden" name="id" id="field-id" />
+
+      <div class="form-group">
+        <label for="field-name">Name</label>
+        <input type="text" name="name" id="field-name" />
+        <div class="error-message" id="error-name"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="field-email">Email</label>
+        <input type="email" name="email" id="field-email" />
+        <div class="error-message" id="error-email"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="field-age">Age</label>
+        <input type="number" name="age" id="field-age" />
+        <div class="error-message" id="error-age"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="field-role">Role</label>
+        <select name="role" id="field-role">
+          <option value="admin">Admin</option>
+          <option value="user">User</option>
+          <option value="guest">Guest</option>
+        </select>
+        <div class="error-message" id="error-role"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="field-bio">Bio</label>
+        <textarea name="bio" id="field-bio" rows="3"></textarea>
+        <div class="error-message" id="error-bio"></div>
+      </div>
+
+      <div class="form-group">
+        <label style="display: flex; align-items: center; font-weight: normal">
+          <input
+            type="checkbox"
+            name="notifications"
+            id="field-notifications"
+            style="margin-right: 10px"
+          />
+          Enable Notifications
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label for="field-tags">Tags (comma separated)</label>
+        <input type="text" name="tags" id="field-tags" />
+        <div class="error-message" id="error-tags"></div>
+      </div>
+
+      <button type="submit" id="submitBtn">Save Entity</button>
+      <div id="formStatus" class="status"></div>
+    </form>
+
+    <script>
+      const form = document.getElementById("entityForm");
+      const statusDiv = document.getElementById("formStatus");
+      const urlParams = new URLSearchParams(window.location.search);
+      const entityId = urlParams.get("id");
+
+      // Populate form with data
+      function populateForm(data) {
+        Object.keys(data).forEach((key) => {
+          const field = document.getElementById(`field-${key}`);
+          if (!field) return;
+
+          if (field.type === "checkbox") {
+            field.checked = !!data[key];
+          } else if (key === "tags" && Array.isArray(data[key])) {
+            field.value = data[key].join(", ");
+          } else {
+            field.value = data[key];
+          }
+        });
+
+        if (data.id) {
+          document.getElementById("title").textContent =
+            "Edit Entity: " + data.id;
+          document.getElementById("submitBtn").textContent = "Update Entity";
+        }
+      }
+
+      // Clear errors
+      function clearErrors() {
+        document
+          .querySelectorAll(".error-message")
+          .forEach((el) => (el.textContent = ""));
+        statusDiv.className = "status";
+        statusDiv.textContent = "";
+      }
+
+      // Show errors
+      function showErrors(tree) {
+        if (tree.properties) {
+          Object.keys(tree.properties).forEach((key) => {
+            const errorEl = document.getElementById(`error-${key}`);
+            if (
+              errorEl &&
+              tree.properties[key].errors &&
+              tree.properties[key].errors.length > 0
+            ) {
+              errorEl.textContent = tree.properties[key].errors[0];
+            }
+          });
+        }
+        statusDiv.className = "status error";
+        statusDiv.textContent = "Please fix the errors above.";
+      }
+
+      // Initial load
+      async function init() {
+        try {
+          if (entityId) {
+            const response = await fetch(`/form/entity/${entityId}`);
+            if (!response.ok) throw new Error("Entity not found");
+            const data = await response.json();
+            populateForm(data);
+          } else {
+            const response = await fetch("/form/create");
+            const data = await response.json();
+            populateForm(data);
+          }
+        } catch (error) {
+          console.error("Error loading form:", error);
+          statusDiv.className = "status error";
+          statusDiv.textContent = "Error loading data: " + error.message;
+        }
+      }
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        clearErrors();
+
+        const formData = new FormData(form);
+        const data = {};
+
+        formData.forEach((value, key) => {
+          if (key === "notifications") {
+            data[key] = true;
+          } else if (key === "tags") {
+            data[key] = value
+              .split(",")
+              .map((s) => s.trim())
+              .filter((s) => s !== "");
+          } else if (key === "age") {
+            data[key] = value === "" ? null : Number(value);
+          } else {
+            data[key] = value;
+          }
+        });
+
+        if (!data.notifications) data.notifications = false;
+        if (!data.id) delete data.id;
+
+        try {
+          const response = await fetch("/form/save", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          });
+
+          const result = await response.json();
+
+          if (response.ok) {
+            statusDiv.className = "status success";
+            statusDiv.textContent = "Saved successfully!";
+            populateForm(result.data);
+
+            if (!entityId) {
+              window.history.pushState({}, "", `?id=${result.data.id}`);
+              document.getElementById("title").textContent =
+                "Edit Entity: " + result.data.id;
+              document.getElementById("submitBtn").textContent =
+                "Update Entity";
+            }
+          } else if (result.errors) {
+            showErrors(result.errors);
+          } else {
+            throw new Error(result.error || "Server error");
+          }
+        } catch (error) {
+          statusDiv.className = "status error";
+          statusDiv.textContent = "Error: " + error.message;
+        }
+      });
+
+      init();
+    </script>
+  </body>
+</html>

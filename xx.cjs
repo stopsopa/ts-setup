@@ -27,6 +27,8 @@ cat <<EEE
 
   🐙 GitHub: $(git ls-remote --get-url origin | awk '{\$1=\$1};1' | tr -d '\\n' | sed -E 's/git@github\\.com:([^/]+)\\/(.+)\\.git/https:\\/\\/github.com\\/\\1\\/\\2/g')
 
+  http://0.0.0.0:\${PORT}/form-ui/index.html
+
 
 EEE
 
