@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">89.47% </span>
+                <span class="strong">89.56% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>102/114</span>
+                <span class='fraction'>103/115</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">89.47% </span>
+                <span class="strong">89.56% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>102/114</span>
+                <span class='fraction'>103/115</span>
             </div>
         
             
@@ -177,7 +177,9 @@
 <a name='L112'></a><a href='#L112'>112</a>
 <a name='L113'></a><a href='#L113'>113</a>
 <a name='L114'></a><a href='#L114'>114</a>
-<a name='L115'></a><a href='#L115'>115</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -291,8 +293,9 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { promises as fsPromises, constants } from "fs";
-import path from "path";
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import fs from "node:fs/promises";
+import { constants } from "node:fs";
+import path from "node:path";
 &nbsp;
 /**
  * Modern async file system operations example
@@ -325,7 +328,7 @@ export async function getPathStatus(targetPath: string): Promise&lt;PathStatus&g
   try {
     // Check if path exists and get stats
     // Use lstat to not follow symlinks for the initial check
-    const stats = await fsPromises.lstat(targetPath);
+    const stats = await fs.lstat(targetPath);
     status.exists = true;
     status.isFile = stats.isFile();
     status.isDirectory = stats.isDirectory();
@@ -334,7 +337,7 @@ export async function getPathStatus(targetPath: string): Promise&lt;PathStatus&g
 &nbsp;
     // Check readability
     try {
-      await fsPromises.access(targetPath, constants.R_OK);
+      await fs.access(targetPath, constants.R_OK);
       status.isReadable = true;
     } <span class="branch-0 cbranch-no" title="branch not covered" >catch {</span>
 <span class="cstat-no" title="statement not covered" >      status.isReadable = false;</span>
@@ -342,7 +345,7 @@ export async function getPathStatus(targetPath: string): Promise&lt;PathStatus&g
 &nbsp;
     // Check writability
     try {
-      await fsPromises.access(targetPath, constants.W_OK);
+      await fs.access(targetPath, constants.W_OK);
       status.isWritable = true;
     } <span class="branch-0 cbranch-no" title="branch not covered" >catch {</span>
 <span class="cstat-no" title="statement not covered" >      status.isWritable = false;</span>
@@ -366,10 +369,10 @@ export async function writeFile(
     const dir = path.dirname(filePath);
 &nbsp;
     // Ensure parent directory exists
-    await fsPromises.mkdir(dir, { recursive: true });
+    await fs.mkdir(dir, { recursive: true });
 &nbsp;
     // Write file
-    await fsPromises.writeFile(filePath, content, "utf8");
+    await fs.writeFile(filePath, content, "utf8");
   } <span class="branch-0 cbranch-no" title="branch not covered" >catch (error: any) {</span>
 <span class="cstat-no" title="statement not covered" >    throw new Error(</span>
 <span class="cstat-no" title="statement not covered" >      `fs-async.ts error: Failed to write to ${filePath}. ${error.message}`,</span>
@@ -382,7 +385,7 @@ export async function writeFile(
  */
 export async function readFile(filePath: string): Promise&lt;string&gt; {
   try {
-    return await fsPromises.readFile(filePath, "utf8");
+    return await fs.readFile(filePath, "utf8");
   } catch (error: any) {
     throw new Error(
       `fs-async.ts error: Failed to read ${filePath}. ${error.message}`,
@@ -398,7 +401,7 @@ export async function removePath(targetPath: string): Promise&lt;void&gt; {
     // fs.rm works for both files and directories.
     // recursive: true - allows deleting directories with content.
     // force: true - ignores ENOENT (file not found) errors, making it idempotent.
-    await fsPromises.rm(targetPath, { recursive: true, force: true });
+    await fs.rm(targetPath, { recursive: true, force: true });
   } <span class="branch-0 cbranch-no" title="branch not covered" >catch (error: any) {</span>
 <span class="cstat-no" title="statement not covered" >    throw new Error(</span>
 <span class="cstat-no" title="statement not covered" >      `fs-async.ts error: Failed to remove ${targetPath}. ${error.message}`,</span>
@@ -412,7 +415,7 @@ export async function removePath(targetPath: string): Promise&lt;void&gt; {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-02-13T18:12:59.221Z
+                at 2026-02-13T18:18:29.343Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
