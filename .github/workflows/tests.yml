@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -17,7 +17,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -32,20 +33,12 @@ jobs:
         run: /bin/bash test.sh
 
       - name: Prepare coverage for deployment
-        if: github.event_name == 'push' && (github.ref == 'refs/heads/tsx' || github.ref == 'refs/heads/native')
         run: /bin/bash .github/workflows/prepare-ghpages.sh
 
-      - name: Setup Pages
-        if: github.event_name == 'push' && (github.ref == 'refs/heads/tsx' || github.ref == 'refs/heads/native')
-        uses: actions/configure-pages@v5
-
-      - name: Upload artifact
-        if: github.event_name == 'push' && (github.ref == 'refs/heads/tsx' || github.ref == 'refs/heads/native')
-        uses: actions/upload-pages-artifact@v4
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          path: "./site"
-
-      - name: Deploy to GitHub Pages
-        if: github.event_name == 'push' && (github.ref == 'refs/heads/tsx' || github.ref == 'refs/heads/native')
-        id: deployment
-        uses: actions/deploy-pages@v4
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./gh-pages
+          keep_files: true
