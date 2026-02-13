@@ -22,7 +22,7 @@ app.use("/api", apiRouter);
 app.use("/form", formRouter);
 
 // Basic health check
-app.get("/health", (req, res) => {
+app.get("/health", (_req, res) => {
   res.send("Server is up and running");
 });
 

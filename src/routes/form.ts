@@ -23,12 +23,12 @@ const ensureDataDir = async () => {
 const router = Router();
 
 // Endpoint to get default values
-router.get("/create", (req, res) => {
+router.get("/create", (_req, res) => {
   res.json(defaultFormValues);
 });
 
 // Endpoint to list all entities (raw HTML)
-router.get("/list", async (req, res) => {
+router.get("/list", async (_req, res) => {
   await ensureDataDir();
   try {
     const files = await fs.readdir(DATA_DIR);
