@@ -11,9 +11,10 @@
  */
 export default class Semaphore {
   private permits: number;
+  private maxPermits: number;
   private waiters: (() => void)[] = [];
   constructor(permits: number) {
-    this.permits = permits;
+    this.maxPermits = this.permits = permits;
   }
   acquire() {
     return new Promise<void>((resolve) => {
@@ -30,7 +31,9 @@ export default class Semaphore {
     if (next) {
       next();
     } else {
-      this.permits += 1;
+      if (this.permits !== this.maxPermits) {
+        this.permits += 1;
+      }
     }
   }
 }
