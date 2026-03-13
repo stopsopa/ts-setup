@@ -23,7 +23,9 @@ test("Semaphore - order", async () => {
   async function doStuff(id) {
     await semaphore.acquire();
     order.push(id);
-    await new Promise((resolve) => setTimeout(resolve, Math.random() * 100 + 900));
+    await new Promise(
+      (resolve) => setTimeout(resolve, Math.random() * 100 + 900)
+    );
     // await new Promise((resolve) => setTimeout(resolve, 1000));
     semaphore.release();
   }
