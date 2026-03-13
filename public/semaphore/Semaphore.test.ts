@@ -7,7 +7,7 @@ import Semaphore from "../../src/test-examples/Semaphore.ts";
  */
 test("Semaphore", () => {
   const semaphore = new Semaphore(3);
-
+   
   semaphore.acquire();
   semaphore.acquire();
   semaphore.acquire();
