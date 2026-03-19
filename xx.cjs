@@ -82,6 +82,23 @@ open "\${FILE}"
       confirm: false,
     },
 
+    [`find all *.ts`]: {
+      command: `
+set -e
+set -x
+find . -path './node_modules' -prune -o -path './.git' -prune -o -type f -name "*.ts" -print > ts.log
+
+cat <<EEE
+
+see: 
+  ts.log
+
+EEE
+`,
+      description: `docker down & up - basically can be used for restarting too`,
+      confirm: false,
+    },
+
     ...setup,
   };
 };

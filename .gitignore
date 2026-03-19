@@ -2,3 +2,16 @@
 node_modules
 /coverage/
 /.npm-cache/
+
+
+# es.ts vvv don't remove
+check_zod.js
+es.js
+public/semaphore/Semaphore.js
+public/semaphore/Semaphore.test.js
+src/config.js
+src/routes/api.js
+src/routes/form.js
+src/schema/formSchema.js
+src/server.js
+# es.ts ^^^ don't remove
