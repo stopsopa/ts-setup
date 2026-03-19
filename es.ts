@@ -1,3 +1,13 @@
+/** @es.ts 
+{
+   mode: "bundle|transform",
+   options: {
+     target: "esnext", loader: "ts", 
+     charset: "utf8", minify: false
+   }
+}
+@es.ts */
+
 import * as esbuild from "esbuild";
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { dirname, join, basename, resolve, relative } from "node:path";
@@ -93,7 +103,10 @@ async function stripTypes(filePath: string): Promise<string | undefined> {
       console.log(JSON.stringify(options, null, 2));
     }
 
-    const result: esbuild.TransformResult = await esbuild.transform(input, options);
+    const result: esbuild.TransformResult = await esbuild.transform(
+      input,
+      options,
+    );
 
     let outputText: string = result.code;
 
@@ -195,11 +208,7 @@ for await (const line of rl) {
 await Promise.all(activeTasks);
 
 if (PRODUCE_GITIGNORE && gitignorePaths.length > 0) {
-  const content = [
-    startMarker,
-    ...gitignorePaths.sort(),
-    endMarker,
-  ].join("\n");
+  const content = [startMarker, ...gitignorePaths.sort(), endMarker].join("\n");
 
   if (UPDATE_GITIGNORE) {
     const gitignorePath = join(gitRoot, ".gitignore");
