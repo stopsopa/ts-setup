@@ -1,9 +1,8 @@
 /** @es.ts 
 {
-   mode: "bundle|transform",
+   mode: "bundle",
+   extension: ".mjs",
    options: {
-     target: "esnext", loader: "ts", 
-     charset: "utf8", minify: false
    }
 }
 @es.ts */
@@ -23,6 +22,8 @@ interface Config {
   loader: esbuild.Loader;
   charset: "utf8" | "ascii" | undefined;
   minify: boolean;
+  bundle: boolean;
+  extension: string;
 }
 
 const CONFIG: Config = {
@@ -30,6 +31,8 @@ const CONFIG: Config = {
   loader: "ts",
   charset: "utf8",
   minify: false,
+  bundle: false,
+  extension: ".js",
 };
 
 const ES_PARALLEL_RAW = env.ES_PARALLEL || "2";
@@ -82,48 +85,106 @@ if (!PRODUCE_GITIGNORE) {
 
 async function stripTypes(filePath: string): Promise<string | undefined> {
   try {
-    const source: string = readFileSync(filePath, "utf8");
+    const source = readFileSync(filePath, "utf8");
+    const startMarker = "/** @es.ts";
+    const endMarker = "@es.ts */";
 
-    // Protection Hack: esbuild's transform API strips non-legal comments.
-    // We temporarily turn standard comments into "legal" ones to preserve them.
-    const protectedSource: string = source
-      .replace(/\/\*\*/g, "/*!") // JSDoc -> Legal block
-      .replace(/\/\/ /g, "//! "); // Single line -> Legal line
+    let buildMode: "bundle" | "transform" = CONFIG.bundle
+      ? "bundle"
+      : "transform";
+    let localOptions: any = { ...CONFIG };
 
-    const input = protectedSource;
-    const options: esbuild.TransformOptions = {
-      target: CONFIG.target as any,
-      loader: CONFIG.loader,
-      charset: CONFIG.charset,
-      minify: CONFIG.minify,
-      legalComments: "inline", // Ensure legal comments are kept in place
+    const startIndex = source.indexOf(startMarker);
+    const endIndex = source.indexOf(endMarker);
+
+    if (startIndex !== -1 && endIndex !== -1 && startIndex < endIndex) {
+      const configStr = source
+        .substring(startIndex + startMarker.length, endIndex)
+        .trim();
+      try {
+        // Using Function to safely parse the object literal (allows unquoted keys)
+        const config = new Function(`return (${configStr})`)();
+        if (config.mode) {
+          if (config.mode !== "bundle" && config.mode !== "transform") {
+            throw th(
+              `Invalid mode "${config.mode}" in ${filePath}. Only "bundle" or "transform" are allowed.`,
+            );
+          }
+          buildMode = config.mode;
+        }
+        if (config.extension) {
+          localOptions.extension = config.extension;
+        }
+        if (config.options) {
+          localOptions = { ...localOptions, ...config.options };
+        }
+      } catch (e: any) {
+        if (e.message.includes('Invalid mode "')) {
+          throw e;
+        }
+        console.error(
+          `Error parsing @es.ts config in ${filePath}: ${e.message}`,
+        );
+      }
+    }
+
+    const outPath: string = join(
+      dirname(filePath),
+      basename(filePath).replace(/\.ts$/, localOptions.extension),
+    );
+
+    const options: esbuild.BuildOptions = {
+      entryPoints: [filePath],
+      bundle: buildMode === "bundle",
+      write: false,
+      target: localOptions.target as any,
+      charset: localOptions.charset,
+      minify: localOptions.minify,
+      legalComments: "inline",
+      platform: "node",
+      format: "esm",
+      plugins: [
+        {
+          name: "protect-comments",
+          setup(build) {
+            build.onLoad({ filter: /\.ts$/ }, async (args) => {
+              const content = readFileSync(args.path, "utf8");
+              const contents = content
+                .replace(/\/\*\*/g, "/*!") // JSDoc -> Legal block
+                .replace(/\/\/ /g, "//! "); // Single line -> Legal line
+              return { contents, loader: "ts" };
+            });
+          },
+        },
+      ],
     };
 
     if (env.DEBUG) {
       console.log(JSON.stringify(options, null, 2));
     }
 
-    const result: esbuild.TransformResult = await esbuild.transform(
-      input,
-      options,
-    );
+    const result = await esbuild.build(options);
 
-    let outputText: string = result.code;
+    if (result.outputFiles && result.outputFiles[0]) {
+      let outputText: string = result.outputFiles[0].text;
 
-    // Restore protected comments
-    outputText = outputText.replace(/\/\*\!/g, "/**").replace(/\/\/! /g, "// ");
+      // Restore protected comments
+      outputText = outputText
+        .replace(/\/\*\!/g, "/**")
+        .replace(/\/\/! /g, "// ")
+        .replace(/(@es\.ts \*\/\s*)/g, "@es.ts */\n");
 
-    const outPath: string = join(
-      dirname(filePath),
-      basename(filePath).replace(/\.ts$/, ".js"),
-    );
+      writeFileSync(outPath, outputText);
+    }
 
-    writeFileSync(outPath, outputText);
     if (!PRODUCE_GITIGNORE) {
-      console.log(`Transpiled (esbuild): ${filePath} -> ${outPath}`);
+      console.log(
+        `${buildMode === "bundle" ? "Bundled" : "Transpiled"} (esbuild): ${filePath} -> ${outPath}`,
+      );
     }
     return outPath;
   } catch (err: unknown) {
+    hasError = true;
     const message = err instanceof Error ? err.message : String(err);
     console.error(`Error processing ${filePath}: ${message}`);
     return undefined;
@@ -139,7 +200,7 @@ Usage:
   touch .esignore # add ignores
   find . -path './node_modules' -prune -o -path './.git' -prune -o -type f -name '*.ts' -print \
     | NODE_OPTIONS="" node gitignore.js .esignore \
-    | NODE_OPTIONS="" node es.mjs
+    | NODE_OPTIONS="" DEBUG=true /bin/bash ts.sh es.ts --produce-gitignore --update
 
 Description:
   Transpiles TypeScript files to JavaScript using esbuild, stripping types 
@@ -155,6 +216,19 @@ Description:
     Only works with --produce-gitignore. Automatically updates the block 
     in .gitignore between '# es.ts vvv' and '# es.ts ^^^' markers.
 
+  Per-file configuration:
+    Add this block to a .ts file to override default behavior:
+/** @es.ts 
+{
+    mode: "bundle|transform",
+    extension: ".js|.mjs",
+    options: {
+      target: "esnext", loader: "ts", 
+      charset: "utf8", minify: false
+    }
+}
+@es.ts */
+  
   DEBUG=true:
     When this environment variable is set, the parameters passed 
     to esbuild.transform (input and options) are dumped to the 
@@ -176,6 +250,7 @@ const rl = createInterface({
 });
 
 let processedCount: number = 0;
+let hasError: boolean = false;
 const gitignorePaths: string[] = [];
 const semaphore = new Semaphore(ES_PARALLEL);
 const activeTasks = new Set<Promise<void>>();
@@ -246,4 +321,8 @@ if (PRODUCE_GITIGNORE && gitignorePaths.length > 0) {
 
 if (processedCount === 0 && !PRODUCE_GITIGNORE) {
   showHelp();
+}
+
+if (hasError) {
+  process.exit(1);
 }

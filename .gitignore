@@ -6,7 +6,7 @@ node_modules
 
 # es.ts vvv don't remove
 check_zod.js
-es.js
+es.mjs
 public/semaphore/Semaphore.js
 public/semaphore/Semaphore.test.js
 src/config.js
