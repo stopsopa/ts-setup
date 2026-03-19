@@ -80,16 +80,20 @@ async function stripTypes(filePath: string): Promise<string | undefined> {
       .replace(/\/\*\*/g, "/*!") // JSDoc -> Legal block
       .replace(/\/\/ /g, "//! "); // Single line -> Legal line
 
-    const result: esbuild.TransformResult = await esbuild.transform(
-      protectedSource,
-      {
-        target: CONFIG.target,
-        loader: CONFIG.loader,
-        charset: CONFIG.charset,
-        minify: CONFIG.minify,
-        legalComments: "inline", // Ensure legal comments are kept in place
-      },
-    );
+    const input = protectedSource;
+    const options: esbuild.TransformOptions = {
+      target: CONFIG.target as any,
+      loader: CONFIG.loader,
+      charset: CONFIG.charset,
+      minify: CONFIG.minify,
+      legalComments: "inline", // Ensure legal comments are kept in place
+    };
+
+    if (env.DEBUG) {
+      console.log(JSON.stringify(options, null, 2));
+    }
+
+    const result: esbuild.TransformResult = await esbuild.transform(input, options);
 
     let outputText: string = result.code;
 
@@ -137,6 +141,11 @@ Description:
   --update:
     Only works with --produce-gitignore. Automatically updates the block 
     in .gitignore between '# es.ts vvv' and '# es.ts ^^^' markers.
+
+  DEBUG=true:
+    When this environment variable is set, the parameters passed 
+    to esbuild.transform (input and options) are dumped to the 
+    console for each processed file.
   
 Built-in Config:
 ${JSON.stringify(CONFIG, null, 2)}
