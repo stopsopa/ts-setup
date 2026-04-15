@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import Semaphore from "../../src/test-examples/Semaphore.ts";
+import Semaphore from "./Semaphore.ts";
 
 /**
  *
